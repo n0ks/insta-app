@@ -30,13 +30,13 @@ export default class Post extends Component {
   }
 
   like = () => {
-   
+
     let novaLista = [];
 
     if (!this.state.foto.likeada) {
       novaLista = [
         ...this.state.foto.likers,
-         { login: 'meusuario' }
+        { login: 'meusuario' }
       ]
     } else {
       novaLista = this.state.foto.likers
@@ -56,9 +56,23 @@ export default class Post extends Component {
     if (likers.length == 0)
       return
 
-    return <Text style={styles.curtidas}>{likers.length}{likers.lenght >= 1 ? 'curtidas ': ' curtida'}</Text>
+    return <Text style={styles.curtidas}>{likers.length}{likers.lenght >= 1 ? 'curtidas ' : ' curtida'}</Text>
 
 
+  }
+
+  exibeLegendas = (foto) => {
+    if (foto.comentario == '')
+      return;
+
+    return (
+
+      <Text style={styles.comentario}>
+        <Text style={styles.comentarioUser}>{foto.login}</Text>
+        <Text>{foto.comentario}</Text>
+
+      </Text>
+    )
   }
 
   render() {
@@ -66,24 +80,37 @@ export default class Post extends Component {
 
     return (
       <View>
-
+        {/* HEADER */}
         <View style={styles.header}>
           <Image source={{ uri: 'https://www.abeautifulsite.net/uploads/2014/08/bit-face.png?width=600&key=c6d70b7b067981cded2d49fc8a5e3ca1dc9dc9fdaab2ac05db4cb96481a36a77' }}
             style={styles.fotoDePerfil} />
           <Text style={styles.userText}>{foto.loginUsuario.replace(/\b\w/g, letra => letra.toUpperCase())}</Text>
         </View>
+        {/* HEADER */}
 
         <Image source={{ uri: foto.urlFoto }}
           style={styles.foto} />
 
+        {/* RODAPE */}
         <View style={styles.rodape}>
           <TouchableOpacity onPress={this.like}>
             <Image style={styles.botaoDeLike}
               source={this.carregaIcone(foto.likeada)}
             />
           </TouchableOpacity>
-          {
-            this.exibeLikes(foto.likers)
+          {this.exibeLikes(foto.likers)}
+        </View>
+        {this.exibeLegendas(foto)}
+        {/* RODAPE */}
+
+        <View style={styles.comentariosWrapper}>
+          {foto.comentarios.map(comentario =>
+            <Text>
+              <Text style={styles.userComentario}>{comentario.login}:  </Text>
+              <Text style={styles.userComentarioTexto}>{comentario.texto}</Text>
+            </Text>
+          )
+
           }
         </View>
       </View>
@@ -138,6 +165,18 @@ const styles = StyleSheet.create({
   botaoDeLike: {
     height: 32,
     width: 32
+  },
+
+  userComentario: {
+    fontWeight: 'bold',
+    marginLeft: 10,
+    paddingLeft: 10
+  },
+  userComentarioTexto: {
+    margin: 10
+  },
+  comentariosWrapper: {
+    padding: 10
   }
 });
 
