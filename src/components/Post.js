@@ -7,7 +7,8 @@ import {
   View,
   Image,
   Dimensions,
-  TouchableOpacity
+  TouchableOpacity,
+  TextInput
 } from 'react-native';
 
 const screen = Dimensions.get('screen');
@@ -18,6 +19,7 @@ export default class Post extends Component {
     super(props);
     this.state = {
       foto: this.props.foto,
+      valorComentario: ''
 
     }
   }
@@ -75,6 +77,27 @@ export default class Post extends Component {
     )
   }
 
+  adicionaComentario = () => {
+    if (!this.state.valorComentario) return;
+    const novaLista = [
+      ...this.state.foto.comentarios, {
+        
+        id: Math.random() * 20 | 0,
+        login: 'meusuario',
+        texto: this.state.valorComentario
+      }
+    ]
+    console.warn(...novaLista);
+
+    const fotoAtualizada = {
+      ...this.state.foto,
+      comentarios: novaLista
+    }
+      
+    this.setState({ foto: fotoAtualizada, valorComentario: '' })
+    this.inputComentario.clear()
+  }
+
   render() {
     const { foto } = this.state;
 
@@ -105,13 +128,25 @@ export default class Post extends Component {
 
         <View style={styles.comentariosWrapper}>
           {foto.comentarios.map(comentario =>
-            <Text>
+            <Text key={comentario.id}>
               <Text style={styles.userComentario}>{comentario.login}:  </Text>
               <Text style={styles.userComentarioTexto}>{comentario.texto}</Text>
             </Text>
           )
 
           }
+          <View style={styles.comentarioWrapper}>
+            <TextInput style={styles.input} placeholder="Digite um comentário..."
+              underlineColorAndroid="transparent"
+              ref={input => this.inputComentario = input}
+              onChangeText={text => this.setState({ valorComentario: text })} />
+
+
+            <TouchableOpacity onPress={this.adicionaComentario}>
+              <Image style={styles.botaoComentario} source={require('../../resources/img/send.png')} />
+            </TouchableOpacity>
+
+          </View>
         </View>
       </View>
     );
@@ -177,6 +212,22 @@ const styles = StyleSheet.create({
   },
   comentariosWrapper: {
     padding: 10
+  },
+  input: {
+    height: 40,
+    flex: 1
+  },
+  botaoComentario: {
+    height: 32,
+
+    width: 32,
+
+  },
+  comentarioWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+
+
   }
 });
 

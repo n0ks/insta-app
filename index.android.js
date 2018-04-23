@@ -23,28 +23,32 @@ export default class InstaluraMobile extends Component {
       fotos: []
     }
   }
-  componentDidMount() {this.fetchImages()}
 
-  fetchImages = async () => {
-    const res = await fetch(global.endpoint).catch(err => console.warn(err))
+  componentDidMount() {
+    fetch(global.endpoint)
+    .then(res => res.json())
+    .then(data => this.setState({ fotos: data }))
+  }
+
+/*   fetchImages = async () => {
+    const res = await fetch('https://instalura-api.herokuapp.com/api/public/fotos/rafael').catch(err => console.warn(err))
     const data = await res.json()
     this.setState({ fotos: data })
-  }
+  } */
 
-  render() {
+render() {
 
-    return (
-      <FlatList
-        keyExtractor={item => item.id}
-        data={this.state.fotos}
-        renderItem={({ item }) =>
-          <Post foto={item} />
+  return (
+    <FlatList
+      keyExtractor={item => item.id}
+      data={this.state.fotos}
+      renderItem={({ item }) =>
+        <Post foto={item} />
+      }
+    />
 
-        }
-      />
-
-    );
-  }
+  );
+}
 }
 
 AppRegistry.registerComponent('InstaluraMobile', () => InstaluraMobile);
