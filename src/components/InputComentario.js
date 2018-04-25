@@ -19,7 +19,7 @@ export default class InputComentario extends Component {
     }
 
     render() {
-        const { comentarioCallback } = this.props
+        const { comentarioCallback,idFoto } = this.props
 
         return (
             <View style={styles.comentarioWrapper}>
@@ -31,8 +31,9 @@ export default class InputComentario extends Component {
 
                 <TouchableOpacity
                     onPress={() => {
-                        comentarioCallback(this.state.valorComentario)
+                        comentarioCallback(idFoto,this.state.valorComentario)
                         this.inputComentario.clear()
+                        this.setState({valorComentario: ''})
                     }}>
                     <Image style={styles.botaoComentario} source={require('../../resources/img/send.png')} />
                 </TouchableOpacity>
@@ -53,8 +54,7 @@ const styles = new StyleSheet.create({
     botaoComentario: {
         height: 28,
         opacity: 0.5,
-        width: 28,
-
+        width: 28
     },
     comentarioWrapper: {
         flexDirection: 'row',
