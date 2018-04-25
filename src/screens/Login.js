@@ -2,19 +2,19 @@ import React, { Component } from 'react'
 import {
     StyleSheet,
     View,
+    Text,
     TextInput,
     Dimensions,
     Button,
-    TouchableOpacity,
-    AsyncStorage,
-    Text
-} from 'react-native';
+    Image,
+    AsyncStorage
+} from 'react-native'
 
 export default class Login extends Component {
     constructor() {
         super()
         this.state = {
-            usuario: '',
+            login: '',
             senha: '',
             validacao: ''
         }
@@ -22,47 +22,47 @@ export default class Login extends Component {
     efetuaLogin = () => {
         //if (!this.state.usuario || !this.state.senha) return;
 
-        const request = {
-            method: 'POST',
-            body: JSON.stringify({
-                login: this.state.usuario,
-                senha: this.state.senha
-            }),
-            headers: new Headers({
-                "Content-type": "application/json"
-            })
-        }
-        const uri = 'http://192.168.0.137:8080/api/public/login'
+        const url = 'http://192.168.0.137:8080/api/public/login'
+        const { login, senha } = this.state
+        const body = JSON.stringify({ login, senha })
+        const headers = new Headers({ 'Content-Type': 'application/json' })
 
-        fetch(uri, request)
+
+        fetch(url, { method: 'POST', body, headers })
             .then(res => {
-                if (!res.ok) throw new Error("Não foi possível efetuar login");
+                if (!res.ok)
+                    throw new Error("Não foi possível efetuar login")
 
                 return res.text()
-            })
-            .then(data => {
+            }).then(token => {
 
-                const usuario = {
-                    nome: this.state.usuario,
-                    token: data
-                }
+                AsyncStorage.setItem('usuario', JSON.stringify({ login: this.state.login, token })
+                )
 
-                AsyncStorage.setItem('USUARIO', JSON.stringify(usuario))
-
-                AsyncStorage.getItem('USUARIO')
+                AsyncStorage.getItem('usuario')
                     .then(usuario => JSON.parse(usuario))
-                    .then(usuario => console.warn(usuario.nome))
+                    .then(usuario => console.warn(usuario.login))
             })
-            .catch(err => {
-                this.setState({ validacao: err.message })
-            })
+            .catch(error => this.setState({ validacao: error.message }))
     }
+
     render() {
         return (
             <View style={styles.container}>
                 <View style={styles.form}>
-                    <TextInput style={styles.input} defaultValue="rafael" autoCapitalize="none" placeholder="Usuário" underlineColorAndroid="transparent" onChangeText={texto => this.setState({ usuario: texto })} />
-                    <TextInput style={styles.input} secureTextEntry={true} autoCapitalize="none" placeholder="Senha" underlineColorAndroid="transparent" onChangeText={texto => this.setState({ senha: texto })} />
+                    <TextInput style={styles.input}
+                        placeholder="Usuario..."
+                        onChangeText={login => this.setState({ login })}
+                        underlineColorAndroid="transparent"
+                        autoCapitalize="none" />
+
+                    <TextInput style={styles.input}
+                        placeholder="Senha..."
+                        onChangeText={senha => this.setState({ senha })}
+                        underlineColorAndroid="transparent"
+                        autoCapitalize="none"
+                        secureTextEntry={true} />
+
                     <Button style={styles.btn} title="Login" onPress={this.efetuaLogin} />
                 </View>
                 {
@@ -101,3 +101,4 @@ const styles = new StyleSheet.create({
 
     }
 })
+
