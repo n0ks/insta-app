@@ -1,2 +1,2 @@
-import RegisterApp from './src/App';
+import RegisterApp from './src/app';
 RegisterApp();

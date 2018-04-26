@@ -22,7 +22,7 @@ export default class Login extends Component {
     efetuaLogin = () => {
         //if (!this.state.usuario || !this.state.senha) return;
 
-        const url = 'http://192.168.0.137:8080/api/public/login'
+        const url = 'https://instalura-api.herokuapp.com/api/public/login'
         const { login, senha } = this.state
         const body = JSON.stringify({ login, senha })
         const headers = new Headers({ 'Content-Type': 'application/json' })
