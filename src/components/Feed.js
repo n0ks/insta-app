@@ -9,11 +9,12 @@ import {
   AppRegistry,
   StyleSheet,
   FlatList,
-  Text
+  Text,
+  AsyncStorage
 } from 'react-native';
 import Post from './Post';
 
-global.endpoint = 'https://instalura-api.herokuapp.com/api/public/fotos/rafael';
+global.endpoint = 'https://instalura-api.herokuapp.com/api/fotos';
 
 export default class Feed extends Component {
   constructor() {
@@ -24,9 +25,23 @@ export default class Feed extends Component {
   }
 
   componentDidMount() {
+    AsyncStorage.getItem('usuario')
+      .then(usuarioEmTexto => JSON.parse(usuarioEmTexto))
+      .then(usuario => {
+        const request = {
+          headers: new Headers({
+            'X-AUTH-TOKEN': usuario.token
+          })
+        }
+        return request
+      })
+      .then(req => fetch(global.endpoint,req))
+      .then(res => res.json())
+      .then(fotos => this.setState({ fotos }))
+/*       
     fetch(global.endpoint)
       .then(res => res.json())
-      .then(data => this.setState({ fotos: data }))
+      .then(data => this.setState({ fotos: data })) */
   }
 
   findPhotos = (idFoto, fotos = this.state.fotos) => {
