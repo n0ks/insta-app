@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import Post from './Post';
 
-global.endpoint = 'https://instalura-api.herokuapp.com/api/fotos';
+global.endpoint = 'https://instalura-api.herokuapp.com/api/public/fotos/rafael';
 
 export default class Feed extends Component {
   constructor() {

@@ -90,9 +90,6 @@ const styles = StyleSheet.create({
   },
   userText: {
     color: '#262626',
-    borderStyle: 'solid',
-    borderWidth: 2,
-    borderColor: '#e44458',
     padding: 5,
     fontSize: 16,
     fontWeight: 'bold'
