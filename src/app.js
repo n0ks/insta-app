@@ -12,7 +12,8 @@ export default () => {
       if (token) {
         return {
           screen: 'Feed',
-          title: 'Instalura'
+          title: 'Instalura',
+          
         }
       }
       return {

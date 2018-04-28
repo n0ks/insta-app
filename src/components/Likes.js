@@ -15,27 +15,29 @@ export default class Likes extends Component {
     return likeada
       ? require('../../resources/img/s2-checked.png')
       : require('../../resources/img/s2.png')
+      
   }
 
   exibeLikes = (likers) => {
     if (likers.length == 0)
       return
 
-    return <Text style={styles.curtidas}>{likers.length}{likers.lenght >= 1 ? 'curtidas ' : ' curtida'}</Text>
+    return <Text style={styles.curtidas}>{likers.length} {likers.lenght > 1 ? ' curtidas ' : ' curtida'}</Text>
   }
 
 
 
   render() {
     const { foto, likeCallback } = this.props
+    let fotoLikeada = this.carregaIcone(foto.likeada)
     return (
       <View style={styles.rodape}>
-        <TouchableOpacity onPress={() => likeCallback(foto.id)}>
+        <TouchableOpacity onPress={() => {likeCallback(foto.id)}}>
           <Image style={styles.botaoDeLike}
-            source={this.carregaIcone(foto.likeada)}
+            source={fotoLikeada}
           />
         </TouchableOpacity>
-        {this.exibeLikes(foto.likers)}
+        { this.exibeLikes(foto.likers)}
       </View>
     );
   }
@@ -52,5 +54,8 @@ const styles = new StyleSheet.create({
     height: 32,
     width: 32
   },
+  curtidas:{
+    marginLeft:10
+  }
 
 })

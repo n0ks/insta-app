@@ -37,7 +37,7 @@ export default class Login extends Component {
       }).then(token => {
 
         AsyncStorage.setItem('usuario', JSON.stringify({ login: this.state.login }))
-        AsyncStorage.setItem('token', JSON.stringify({ token }))
+        AsyncStorage.setItem('token', token)
 
 
         this.props.navigator.resetTo({

@@ -40,7 +40,7 @@ export default class Post extends Component {
       <View>
         {/* HEADER */}
         <View style={styles.header}>
-          <Image source={{ uri: 'https://www.abeautifulsite.net/uploads/2014/08/bit-face.png?width=600&key=c6d70b7b067981cded2d49fc8a5e3ca1dc9dc9fdaab2ac05db4cb96481a36a77' }}
+          <Image source={{ uri: foto.urlPerfil}}
             style={styles.fotoDePerfil} />
           <Text style={styles.userText}>{foto.loginUsuario.replace(/\b\w/g, letra => letra.toUpperCase())}</Text>
         </View>

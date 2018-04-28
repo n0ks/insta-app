@@ -1,7 +1,7 @@
 /**
  * Sample React Native App
  * https://github.com/facebook/react-native
- * @flow
+ * @flow  
  */
 
 import React, { Component } from 'react';
@@ -13,8 +13,9 @@ import {
   AsyncStorage
 } from 'react-native';
 import Post from './Post';
+import InstaluraFetchService from '../services/InstaluraFetchService';
+import Notificacao from '../api/Notificacao';
 
-global.endpoint = 'https://instalura-api.herokuapp.com/api/public/fotos/rafael';
 
 export default class Feed extends Component {
   constructor() {
@@ -25,23 +26,13 @@ export default class Feed extends Component {
   }
 
   componentDidMount() {
-    AsyncStorage.getItem('usuario')
-      .then(usuarioEmTexto => JSON.parse(usuarioEmTexto))
-      .then(usuario => {
-        const request = {
-          headers: new Headers({
-            'X-AUTH-TOKEN': usuario.token
-          })
-        }
-        return request
+    
+    InstaluraFetchService.get('/fotos')
+      .then(json => this.setState({ fotos: json }))
+      .catch(err => {
+        Notificacao.exibe('ops..', err.message)
       })
-      .then(req => fetch(global.endpoint,req))
-      .then(res => res.json())
-      .then(fotos => this.setState({ fotos }))
-/*       
-    fetch(global.endpoint)
-      .then(res => res.json())
-      .then(data => this.setState({ fotos: data })) */
+
   }
 
   findPhotos = (idFoto, fotos = this.state.fotos) => {
@@ -49,71 +40,82 @@ export default class Feed extends Component {
     return fotos.find(foto => foto.id == idFoto)
   }
 
-  updatePhoto = (fotoAtualizada, stateFoto = this.state.fotos) => {
-
-    return stateFoto
+  updatePhoto = (fotoAtualizada) => {
+    const fotos = this.state.fotos
       .map(foto => foto.id === fotoAtualizada.id ? fotoAtualizada : foto)
+
+    this.setState({ fotos })
   }
 
   adicionaComentario = (idFoto, valorComentario) => {
     if (!valorComentario) return;
 
-
+    
     const foto = this.findPhotos(idFoto)
 
-    const novaLista = [
-      ...foto.comentarios, {
-
-        id: Math.random() * 20 | 0,
-        login: 'meusuario',
-        texto: valorComentario
-      }
-    ]
-    /*   console.warn(...novaLista); */
-
-    const fotoAtualizada = {
-      ...foto,
-      comentarios: novaLista
+    const comentario = {
+      texto: valorComentario
     }
-    const fotos = this.updatePhoto(fotoAtualizada)
 
-    this.setState({ fotos })
+
+    InstaluraFetchService.post(`/fotos/${idFoto}/comment`, comentario)
+      .then(comentario => [...foto.comentarios, comentario])
+      .then(novaLista => {
+
+        const fotoAtualizada = {
+          ...foto,
+          comentarios: novaLista
+        }
+
+        this.updatePhoto(fotoAtualizada)
+      })
+      .catch(err => {
+        this.setState({fotos:foto})
+        Notificacao.exibe('opss', err.message)
+      })
   }
 
   like = (idFoto) => {
+    const listaOriginal = this.state.fotos
     const foto = this.findPhotos(idFoto)
+   
+    const uri = `https://instalura-api.herokuapp.com/api/fotos/${idFoto}/like`
 
-    let novaLista = [];
+    AsyncStorage.getItem('usuario')
+      .then(usuarioLogado => {
 
-    if (!foto.likeada) {
-      novaLista = [
-        ...foto.likers,
-        { login: 'meusuario' }
-      ]
-    } else {
-      novaLista = foto.likers
-        .filter(liker => liker.login != 'meusuario')
-    }
+        let novaLista = [];
 
-    const fotoAtualizada = {
-      ...foto,
-      likeada: !foto.likeada,
-      likers: novaLista
+        if (!foto.likeada) {
+          novaLista = [
+            ...foto.likers,
+            { login: usuarioLogado }
+          ]
+        } else {
+          novaLista = foto.likers
+            .filter(liker => liker.login != usuarioLogado)
+        }
+        return novaLista
+      })
+      .then(novaLista => {
 
-    }
-    const fotos = this.updatePhoto(fotoAtualizada)
+        const fotoAtualizada = {
+          ...foto,
+          likeada: !foto.likeada,
+          likers: novaLista
+        };
+        this.updatePhoto(fotoAtualizada)
+      })
 
-    this.setState({ fotos });
+    InstaluraFetchService.post(`/fotos/${idFoto}/like`)
+      .catch(err => {
+        this.setState({ fotos: listaOriginal })
+        Notificacao.exibe('Ops..', err.message)
+      })
   }
 
-  /*   fetchImages = async () => {
-      const res = await fetch('https://instalura-api.herokuapp.com/api/public/fotos/rafael').catch(err => console.warn(err))
-      const data = await res.json()
-      this.setState({ fotos: data })
-    } */
 
   render() {
-
     return (
       <FlatList
         keyExtractor={item => item.id}
@@ -124,7 +126,6 @@ export default class Feed extends Component {
             comentarioCallback={this.adicionaComentario} />
         }
       />
-
     );
   }
 }
